@@ -6,10 +6,14 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.DriveCMD;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.commands.CollectCMD;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.PositionHoodCMD;
+import frc.robot.commands.ShootCMD;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.CollectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -21,12 +25,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  DriveSubsystem m_DriveSubsystem = new DriveSubsystem();
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem();
+  private final CollectorSubsystem m_CollectorSubsystem = new CollectorSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+  private final CommandXboxController m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final CollectCMD m_CollectCMD = new CollectCMD(m_CollectorSubsystem);
+  private final PositionHoodCMD m_PositionHoodCMD = new PositionHoodCMD(m_ShooterSubsystem);
+  private final ShootCMD m_ShootCMD = new ShootCMD(m_ShooterSubsystem, false);
+  private final ShootCMD m_SlowShootCMD = new ShootCMD(m_ShooterSubsystem, true);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -43,10 +51,17 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_DriveSubsystem.setDefaultCommand(new DriveCMD(m_DriveSubsystem, m_driverController));
-    m_driverController.start().onTrue(Commands.runOnce(m_DriveSubsystem::zeroHeading));// press start to reset gyro
-    m_driverController.x().whileTrue(Commands.run(m_DriveSubsystem::setX));
-    
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new Trigger(m_exampleSubsystem::exampleCondition)
+        .onTrue(new ExampleCommand(m_exampleSubsystem));
+
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
+    //m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    m_driverController.b().toggleOnTrue(m_CollectCMD);
+    //m_driverController.y().whileTrue(m_PositionHoodCMD); there is no hood motor on the alpha bot, so this is just hypothetical code.
+    m_driverController.rightTrigger(0.1).and(m_driverController.rightTrigger(0.5).negate()).whileTrue(m_SlowShootCMD);
+    m_driverController.rightTrigger(0.5).whileTrue(m_ShootCMD);
   }
 
   /**
@@ -56,6 +71,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return null;
+    return Autos.exampleAuto(m_exampleSubsystem);
   }
 }
