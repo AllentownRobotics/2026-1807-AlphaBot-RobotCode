@@ -6,8 +6,17 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.CollectCMD;
 import frc.robot.commands.DriveCMD;
+import frc.robot.commands.PositionHoodCMD;
+import frc.robot.commands.SetKickerSpeed;
+import frc.robot.commands.SetTwindexerSpeed;
+import frc.robot.commands.ShootCMD;
+import frc.robot.subsystems.CollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Kicker;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.Twindexer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
