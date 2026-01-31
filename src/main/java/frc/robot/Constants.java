@@ -107,4 +107,25 @@ public final class Constants {
       public static final int DRIVE_MOTOR_CURRENT_LIMIT = 50; // amps
       public static final int TURN_MOTOR_CURRENT_LIMIT = 20; // amps
   }
+  public static class CollectorConstants {
+    public static final double collectorMotorSpeed = 0.1;
+  }
+  public static class ShooterConstants {
+    public static final double hoodMotorSpeed = 0.1;
+    public static final double shooterMotorSpeed = 0.1;
+  }
+  public static class MotorConstants {
+    public static final int collectorMotorID = 3;
+    public static final int hoodMotorID = 5;
+    public static final int shooterMotorID = 4;
+  }
+  public static class TwindexerConstants {
+    public static final double twindexerMotorSpeed = 0.15;
+    public static final int MotorIDConstants = 1;
+  }
+
+  public static class KickerConstants {
+    public static final double kickerMotorSpeed = 0.15;
+    public static final int MotorIDConstants = 2;
+  }
 }
