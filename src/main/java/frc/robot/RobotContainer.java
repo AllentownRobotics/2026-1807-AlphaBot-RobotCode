@@ -22,11 +22,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   DriveSubsystem m_DriveSubsystem = new DriveSubsystem();
+  private final ShooterSubsystem m_ShooterSubsystem = new ShooterSubsystem();
+  private final CollectorSubsystem m_CollectorSubsystem = new CollectorSubsystem();
+  private final Twindexer m_twindexer = new Twindexer();
+  private final Kicker m_kicker = new Kicker();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+  private final CollectCMD m_CollectCMD = new CollectCMD(m_CollectorSubsystem);
+  private final PositionHoodCMD m_PositionHoodCMD = new PositionHoodCMD(m_ShooterSubsystem);
+  private final ShootCMD m_ShootCMD = new ShootCMD(m_ShooterSubsystem, false);
+  private final ShootCMD m_SlowShootCMD = new ShootCMD(m_ShooterSubsystem, true);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -47,6 +54,13 @@ public class RobotContainer {
     m_driverController.start().onTrue(Commands.runOnce(m_DriveSubsystem::zeroHeading));// press start to reset gyro
     m_driverController.x().whileTrue(Commands.run(m_DriveSubsystem::setX));
     
+    m_driverController.a().toggleOnTrue(new SetTwindexerSpeed(m_twindexer));
+    m_driverController.x().whileTrue(new SetKickerSpeed(m_kicker));
+
+    m_driverController.b().toggleOnTrue(m_CollectCMD);
+    //m_driverController.y().whileTrue(m_PositionHoodCMD); there is no hood motor on the alpha bot, so this is just hypothetical code.
+    m_driverController.rightTrigger(0.1).and(m_driverController.rightTrigger(0.5).negate()).whileTrue(m_SlowShootCMD);
+    m_driverController.rightTrigger(0.5).whileTrue(m_ShootCMD);
   }
 
   /**
